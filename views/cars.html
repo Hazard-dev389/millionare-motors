@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Available Cars | Millionare Motors</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <header>
+    <h1>Millionare Motors</h1>
+    <nav>
+      <a href="/">Home</a>
+      <a href="/cars" class="active">Cars</a>
+      <a href="/contact">Contact</a>
+      <a href="/dealer">Dealer Login</a>
+    </nav>
+  </header>
+
+  <main>
+    <h2>Available Cars</h2>
+    <div id="gallery" class="gallery"></div>
+  </main>
+
+  <footer>
+    <p>© 2025 Millionare Motors</p>
+  </footer>
+
+  <script>
+    async function loadImages() {
+      const res = await fetch('/images');
+      const images = await res.json();
+      const gallery = document.getElementById('gallery');
+
+      if (images.length === 0) {
+        gallery.innerHTML = "<p>No cars available yet.</p>";
+      } else {
+        images.forEach(img => {
+          const card = document.createElement('div');
+          card.className = 'car-card';
+          card.innerHTML = `<img src="${img}" alt="Car"><p>Luxury Car</p>`;
+          gallery.appendChild(card);
+        });
+      }
+    }
+
+    loadImages();
+  </script>
+</body>
+</html>
