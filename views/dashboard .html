@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Dealer Dashboard — Millionaire Motors</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    /* small additions for dashboard */
+    .form { background:#fff;padding:1rem;border-radius:12px;box-shadow:0 8px 30px rgba(2,6,23,0.06); }
+    .form input, .form textarea { width:100%;padding:0.6rem;margin:0.4rem 0;border-radius:8px;border:1px solid #e6e6e9 }
+    .controls { display:flex;gap:8px;flex-wrap:wrap }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <h1 class="brand">Millionaire Motors — Dealer</h1>
+      <nav class="nav">
+        <a href="/">Public Site</a>
+      </nav>
+      <button id="btn-logout" class="btn small" style="display:none">Logout</button>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="form" id="auth-section">
+      <h2>Dealer Login</h2>
+      <form id="login-form">
+        <input name="username" placeholder="Username" required />
+        <input name="password" type="password" placeholder="Password" required />
+        <div class="controls">
+          <button type="submit" class="btn">Login</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="form" id="create-section" style="margin-top:1rem; display:none">
+      <h2>Create Listing</h2>
+      <form id="create-form" enctype="multipart/form-data">
+        <input name="title" placeholder="Title (e.g. Audi A4 S-Line)" required />
+        <input name="year" placeholder="Year (e.g. 2018)" />
+        <input name="engine" placeholder="Engine (e.g. 2000cc Quattro)" />
+        <input name="price" placeholder="Price (e.g. KSh 2.9M)" required />
+        <textarea name="description" placeholder="Small description"></textarea>
+        <label>Images (up to 4) <input name="images" type="file" accept="image/*" multiple /></label>
+        <div class="controls">
+          <button type="submit" class="btn">Publish Listing</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="form" id="manage-section" style="margin-top:1rem; display:none">
+      <h2>Your Listings</h2>
+      <div id="manage-list"></div>
+    </section>
+  </main>
+
+  <script>
+    // dashboard JS (simple)
+    async function api(path, method='GET', body=null) {
+      const opts = { method, headers: {} };
+      if (body && !(body instanceof FormData)) {
+        opts.headers['Content-Type'] = 'application/json';
+        opts.body = JSON.stringify(body);
+      } else if (body instanceof FormData) {
+        opts.body = body;
+      }
+      const res = await fetch(path, opts);
+      return res;
+    }
+
+    async function login(e) {
+      e.preventDefault();
+      const f = e.target;
+      const form = new FormData(f);
+      const username = form.get('username');
+      const password = form.get('password');
+      const r = await api('/api/login', 'POST', { username, password });
+      if (r.ok) {
+        document.getElementById('auth-section').style.display = 'none';
+        document.getElementById('create-section').style.display = '';
+        document.getElementById('manage-section').style.display = '';
+        document.getElementById('btn-logout').style.display = '';
+        loadManage();
+      } else {
+        const j = await r.json();
+        alert(j.error || 'Login failed');
+      }
+    }
+
+    async function createListing(e) {
+      e.preventDefault();
+      const formEl = document.getElementById('create-form');
+      const form = new FormData(formEl);
+      const r = await api('/api/listings', 'POST', form);
+      if (r.ok) {
+        const j = await r.json();
+        alert('Listing created');
+        formEl.reset();
+        loadManage();
+      } else {
+        const j = await r.json();
+        alert(j.error || 'Failed to create listing');
+      }
+    }
+
+    async function loadManage() {
+      const r = await api('/api/listings');
+      const listings = await r.json();
+      const wrap = document.getElementById('manage-list');
+      wrap.innerHTML = '';
+      listings.forEach(l => {
+        const el = document.createElement('div');
+        el.style.marginBottom = '0.75rem';
+        el.style.padding = '0.5rem';
+        el.style.border = '1px solid #eee';
+        el.style.borderRadius = '8px';
+        el.innerHTML = `
+          <div style="display:flex;gap:8px;align-items:center">
+            <img src="${l.images && l.images[0] ? l.images[0] : '/css/placeholder.png'}" alt="" style="width:100px;height:70px;object-fit:cover;border-radius:6px">
+            <div style="flex:1">
+              <strong>${escapeHtml(l.title)}</strong><br/>
+              <small>${escapeHtml(l.price)}</small>
+            </div>
+            <div>
+              <button data-id="${l.id}" class="del-btn btn small">Delete</button>
+            </div>
+          </div>
+        `;
+        wrap.appendChild(el);
+      });
+      document.querySelectorAll('.del-btn').forEach(b => {
+        b.onclick = async () => {
+          if (!confirm('Delete listing?')) return;
+          const id = b.dataset.id;
+          const r2 = await api('/api/listings/' + id, 'DELETE');
+          if (r2.ok) loadManage();
+          else {
+            const j = await r2.json();
+            alert(j.error || 'Failed to delete');
+          }
+        };
+      });
+    }
+
+    function escapeHtml(s) {
+      if (!s) return '';
+      return s.replace(/[&<>"']/g, function (m) {
+        return ({
+          '&': '&amp;',
+          '<': '&lt;',
+          '>': '&gt;',
+          '"': '&quot;',
+          "'": '&#39;'
+        })[m];
+      });
+    }
+
+    document.getElementById('login-form').addEventListener('submit', login);
+    document.getElementById('create-form').addEventListener('submit', createListing);
+    document.getElementById('btn-logout').addEventListener('click', async () => {
+      await api('/api/logout', 'POST');
+      window.location.reload();
+    });
+
+    // Try to check if already logged in by loading listings and showing manage (best-effort)
+    (async function tryLoad() {
+      // nothing automatic here — login required
+    })();
+  </script>
+</body>
+</html>

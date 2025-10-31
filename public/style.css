@@ -1,0 +1,104 @@
+/* style.css - mobile first */
+:root{
+  --bg:#f6f7fb;
+  --card:#ffffff;
+  --accent:#111827;
+  --muted:#6b7280;
+  --brand:#0ea5a4;
+  --radius:12px;
+  --max-width:1100px;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+}
+
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--accent);
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  line-height:1.45;
+}
+
+.container{width:92%;max-width:var(--max-width);margin:0 auto;padding:1.25rem 0;}
+
+.site-header{
+  background:#0f172a;
+  color:#fff;
+  position:sticky;
+  top:0;
+  z-index:50;
+  box-shadow:0 2px 10px rgba(2,6,23,0.15);
+}
+.header-inner{
+  display:flex;
+  align-items:center;
+  gap:1rem;
+  justify-content:space-between;
+  padding:0.75rem 0;
+}
+.brand{margin:0;font-size:1.25rem;letter-spacing:0.2px}
+.nav a{
+  color:#e6edf3;
+  text-decoration:none;
+  margin:0 8px;
+  font-weight:600;
+}
+.nav a:hover{color:var(--brand)}
+.btn{background:transparent;border:1px solid rgba(255,255,255,0.12);color:#fff;padding:0.4rem 0.6rem;border-radius:8px;cursor:pointer}
+.btn.small{padding:0.35rem 0.6rem;font-size:0.9rem}
+
+/* Hero */
+.hero{
+  text-align:center;
+  padding:2rem 0;
+  background:linear-gradient(90deg, rgba(14,165,164,0.06), rgba(99,102,241,0.02));
+  border-bottom:1px solid rgba(0,0,0,0.03);
+  margin-bottom:1rem;
+}
+.hero h2{margin:0 0 0.5rem 0}
+.hero p{color:var(--muted)}
+
+/* listings grid */
+.grid{
+  display:grid;
+  gap:1rem;
+  grid-template-columns: 1fr;
+}
+.car-card{
+  background:var(--card);
+  padding:1rem;
+  border-radius:var(--radius);
+  box-shadow:0 6px 18px rgba(12,15,20,0.06);
+  display:flex;
+  gap:1rem;
+  align-items:stretch;
+}
+.car-card img{
+  width:140px;
+  height:100%;
+  max-height:120px;
+  object-fit:cover;
+  border-radius:8px;
+  flex-shrink:0;
+}
+.card-body{flex:1}
+.card-body h3{margin:0 0 0.25rem 0}
+.card-body p{margin:0;color:var(--muted);font-size:0.95rem}
+.price{font-weight:700;margin-top:0.5rem;color:#0b5e59}
+
+/* contact */
+.contact a{color:var(--brand);text-decoration:none}
+
+/* footer */
+.site-footer{padding:1.25rem 0;background:#0f172a;color:#fff;text-align:center;margin-top:2rem}
+
+/* larger screens */
+@media(min-width:700px){
+  .grid{grid-template-columns:repeat(2,1fr)}
+  .car-card img{width:180px;max-height:140px}
+}
+@media(min-width:1000px){
+  .grid{grid-template-columns:repeat(3,1fr)}
+}
