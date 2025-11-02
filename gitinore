@@ -1,0 +1,64 @@
+# ==========================
+# Node.js & Express Project
+# ==========================
+
+# Node modules and dependencies
+node_modules/
+
+# Environment variables
+.env
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Temporary files
+*.tmp
+*.swp
+*.swo
+
+# ==========================
+# Build and cache
+# ==========================
+dist/
+build/
+.cache/
+.tmp/
+
+# ==========================
+# OS-specific files
+# ==========================
+.DS_Store
+Thumbs.db
+
+# ==========================
+# Uploaded images & media
+# ==========================
+uploads/
+public/uploads/
+
+# ==========================
+# IDE / Editor settings
+# ==========================
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# ==========================
+# Render Deployment
+# ==========================
+# Don’t upload Render logs or generated files
+render.yaml
+*.render-build.log
+
+# ==========================
+# Miscellaneous
+# ==========================
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local

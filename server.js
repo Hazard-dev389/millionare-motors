@@ -1,49 +1,34 @@
-// server.js
-import express from "express";
-import multer from "multer";
-import path from "path";
-import fs from "fs";
-
+const express = require('express');
+const path = require('path');
 const app = express();
-const PORT = 3000;
 
-// Storage setup for Multer (for image uploads)
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "public/uploads");
-  },
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + path.extname(file.originalname));
-  },
+// Serve static files from the public folder
+app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.json());
+
+// Serve specific HTML pages
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-const upload = multer({ storage });
-
-// Middlewares
-app.use(express.static("public"));
-app.use(express.urlencoded({ extended: true }));
-
-// Routes
-app.get("/", (req, res) => {
-  res.sendFile(path.join(process.cwd(), "views", "index.html"));
+app.get('/contact', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'contact.html'));
 });
 
-app.get("/dashboard", (req, res) => {
-  res.sendFile(path.join(process.cwd(), "views", "dashboard.html"));
+app.get('/cars', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'cars.html'));
 });
 
-app.post("/upload", upload.single("carImage"), (req, res) => {
-  res.redirect("/dashboard");
+app.get('/dealer-login', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'dealer-login.html'));
 });
 
-app.get("/images", (req, res) => {
-  const dirPath = path.join(process.cwd(), "public", "uploads");
-  const files = fs.readdirSync(dirPath);
-  const imageFiles = files.filter((f) =>
-    [".jpg", ".jpeg", ".png", ".gif"].includes(path.extname(f).toLowerCase())
-  );
-  res.json(imageFiles);
+// Example image upload or contact route (optional)
+app.post('/send', (req, res) => {
+  console.log(req.body);
+  res.json({ success: true });
 });
 
-// Start server
-app.listen(PORT, () => console.log(`🚗 Server running on http://localhost:${PORT}`));
+// Run the server
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
