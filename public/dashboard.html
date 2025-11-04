@@ -1,25 +1,197 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Dealer Dashboard</title>
-  <link rel="stylesheet" href="/styles.css" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Dealer Dashboard — Millionare Motors</title>
+  <style>
+    body { font-family: Arial, Helvetica, sans-serif; margin: 0; background:#f4f6f9; color:#111; }
+    .wrap { max-width:1000px; margin:28px auto; padding:20px; background:#fff; border-radius:10px; box-shadow:0 6px 20px rgba(0,0,0,0.08);}
+    h1 { color:#2b2b2b; }
+    .col { display:flex; gap:20px; flex-wrap:wrap; }
+    .card { flex:1 1 360px; padding:16px; border-radius:8px; background:#fafbfd; border:1px solid #eef2f7; }
+    label{display:block;margin:10px 0 6px;font-weight:600}
+    input,textarea,select{width:100%;padding:10px;border-radius:6px;border:1px solid #d7dce6}
+    button{background:#4B0082;color:#fff;padding:10px 14px;border:none;border-radius:8px;cursor:pointer}
+    button.secondary{background:#888}
+    .gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin-top:14px}
+    .car{background:#fff;border-radius:8px;padding:8px;border:1px solid #eee}
+    .car img{width:100%;height:150px;object-fit:cover;border-radius:6px}
+    .meta{padding:6px 0}
+    .danger{background:#e74c3c}
+    .success{background:#27ae60}
+    .hidden{display:none}
+    .login-box{max-width:420px;margin:0 auto}
+  </style>
 </head>
 <body>
-  <h1>Welcome to the Dealer Dashboard</h1>
-  <p>Here you can upload your car listings and view existing ones.</p>
+  <div class="wrap">
+    <h1>Dealer Dashboard</h1>
 
-  <form action="/upload" method="POST" enctype="multipart/form-data">
-    <label for="carImage">Upload Car Image:</label>
-    <input type="file" id="carImage" name="carImage" accept="image/*" required />
-    <button type="submit">Upload</button>
-  </form>
+    <div id="authArea">
+      <!-- login area or controls will be injected here -->
+    </div>
 
-  <h2>Uploaded Cars</h2>
-  <div id="gallery">
-    <!-- Uploaded images will show here -->
-    <p>No cars uploaded yet.</p>
+    <div id="mainArea" class="hidden">
+      <div class="col">
+        <div class="card">
+          <h3>Upload New Car</h3>
+          <form id="uploadForm" enctype="multipart/form-data">
+            <label>Car Name</label>
+            <input name="carName" required />
+            <label>Price</label>
+            <input name="price" />
+            <label>Description</label>
+            <textarea name="description" rows="4"></textarea>
+            <label>Image (jpg, png, max 6MB)</label>
+            <input type="file" name="image" accept="image/*" required />
+            <div style="margin-top:10px">
+              <button type="submit">Upload Car</button>
+              <button id="logoutBtn" type="button" class="secondary">Logout</button>
+            </div>
+            <div id="uploadMsg" style="margin-top:8px"></div>
+          </form>
+        </div>
+
+        <div class="card">
+          <h3>Your Uploaded Cars</h3>
+          <div id="carsList" class="gallery"></div>
+        </div>
+      </div>
+    </div>
   </div>
+
+<script>
+async function isAuthenticated() {
+  // Ask /api/cars without side-effects — server validates cookie on protected routes only.
+  // We check auth by attempting an upload-check endpoint: call /api/cars will always be public; instead we'll call /api/check-auth if you want.
+  // Simpler: request to /upload-car with method OPTIONS is not reliable cross-platform; instead request a small protected ping? But server doesn't have that.
+  // We'll detect auth by attempting to fetch /dashboard-protected (not present). Simpler approach: try to fetch a protected endpoint by sending a HEAD to /upload-car won't work. We'll try to simulate: we'll rely on cookie set by server; when login succeeds server redirects and dashboard will load. We'll ask server to return session status by calling a small endpoint; if you want add /api/status. For now we'll implement a simple flow: show login form and after login, show main UI.
+  return false;
+}
+
+// Build login UI
+function showLogin() {
+  const authArea = document.getElementById('authArea');
+  authArea.innerHTML = `
+    <div class="login-box">
+      <div style="padding:16px;border:1px solid #e6e9ef;background:#fff;border-radius:8px">
+        <h3>Dealer Login</h3>
+        <form id="loginForm">
+          <label>Email (optional)</label>
+          <input type="email" name="email" placeholder="dealer@example.com" />
+          <label>Password</label>
+          <input type="password" name="password" required />
+          <div style="margin-top:10px">
+            <button type="submit">Login</button>
+          </div>
+          <div id="loginMsg" style="margin-top:8px;color:#e74c3c"></div>
+        </form>
+      </div>
+    </div>
+  `;
+
+  document.getElementById('loginForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const form = e.target;
+    const password = form.password.value.trim();
+    const loginMsg = document.getElementById('loginMsg');
+    loginMsg.textContent = '';
+    try {
+      const res = await fetch('/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password })
+      });
+      const json = await res.json();
+      if (json.success) {
+        // show main
+        document.getElementById('authArea').classList.add('hidden');
+        document.getElementById('mainArea').classList.remove('hidden');
+        loadCars();
+      } else {
+        loginMsg.textContent = json.message || 'Login failed';
+      }
+    } catch (err) {
+      loginMsg.textContent = 'Server error';
+    }
+  });
+}
+
+async function loadCars() {
+  const res = await fetch('/api/cars');
+  const cars = await res.json();
+  const list = document.getElementById('carsList');
+  list.innerHTML = '';
+  if (!cars.length) list.innerHTML = '<p>No cars uploaded yet.</p>';
+  cars.forEach(c => {
+    const el = document.createElement('div');
+    el.className = 'car';
+    el.innerHTML = `
+      <img src="/uploads/${c.filename}" alt="${c.name}" />
+      <div class="meta"><strong>${c.name}</strong></div>
+      <div class="meta">Price: ${c.price || 'N/A'}</div>
+      <div class="meta">${c.description || ''}</div>
+      <div style="margin-top:8px;display:flex;gap:8px">
+        <button class="danger" data-id="${c.id}" style="background:#e74c3c;color:#fff;border:none;padding:8px;border-radius:6px;cursor:pointer">Delete</button>
+      </div>
+    `;
+    list.appendChild(el);
+    el.querySelector('button').addEventListener('click', async () => {
+      if (!confirm('Delete this car?')) return;
+      const res = await fetch('/delete-car', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: c.id })
+      });
+      const j = await res.json();
+      if (j.success) {
+        loadCars();
+      } else {
+        alert(j.message || 'Failed to delete');
+      }
+    });
+  });
+}
+
+document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const form = e.target;
+  const data = new FormData(form);
+  const uploadMsg = document.getElementById('uploadMsg');
+  uploadMsg.textContent = 'Uploading...';
+
+  try {
+    const res = await fetch('/upload-car', {
+      method: 'POST',
+      body: data
+    });
+    const j = await res.json();
+    if (j.success) {
+      uploadMsg.textContent = 'Uploaded successfully';
+      form.reset();
+      loadCars();
+    } else if (res.status === 401) {
+      uploadMsg.textContent = 'Unauthorized. Please log in again.';
+      document.getElementById('mainArea').classList.add('hidden');
+      document.getElementById('authArea').classList.remove('hidden');
+      showLogin();
+    } else {
+      uploadMsg.textContent = j.message || 'Upload failed';
+    }
+  } catch (err) {
+    uploadMsg.textContent = 'Server error';
+  }
+});
+
+document.getElementById('logoutBtn').addEventListener('click', async () => {
+  await fetch('/api/logout', { method: 'POST' });
+  // simple refresh to show login
+  location.reload();
+});
+
+// initial UI
+showLogin();
+</script>
 </body>
 </html>

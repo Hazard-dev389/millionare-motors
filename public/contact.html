@@ -1,266 +1,288 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Contact - Millionaire Motors</title>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Contact — Millionare Motors</title>
   <style>
-    /* General Styles */
     body {
-      font-family: 'Roboto', sans-serif;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
       margin: 0;
       padding: 0;
-      background: #f5f5f5;
       color: #333;
-      scroll-behavior: smooth;
     }
+
     header {
-      background: linear-gradient(90deg, #1a1a1a, #4B0082);
-      color: #fff;
-      padding: 1.5rem 2rem;
+      background: #1976d2;
+      color: white;
+      padding: 1rem;
       text-align: center;
-      position: sticky;
-      top: 0;
-      z-index: 100;
+      font-size: 1.6rem;
+      font-weight: bold;
     }
-    header h1 {
-      margin: 0;
-      font-size: 2rem;
-    }
-    main {
-      max-width: 1000px;
+
+    .container {
+      max-width: 900px;
       margin: 2rem auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      padding: 0 1rem;
+    }
+
+    iframe {
+      width: 100%;
+      height: 350px;
+      border: none;
+      border-radius: 10px;
+    }
+
+    form {
+      background: white;
       padding: 2rem;
-      background: #fff;
-      border-radius: 12px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
       position: relative;
     }
-    h2 {
-      color: #4B0082;
+
+    form h2 {
+      text-align: center;
+      color: #1976d2;
       margin-bottom: 1rem;
     }
-    p { line-height: 1.6; }
 
-    /* Contact Info */
-    .contact-info div { margin-bottom: 1rem; }
-    a.contact-button {
-      display: inline-block;
-      padding: 0.8rem 1.5rem;
-      background-color: #25D366;
-      color: #fff;
-      font-weight: bold;
-      text-decoration: none;
-      border-radius: 50px;
-      transition: background 0.3s ease;
-    }
-    a.contact-button:hover { background-color: #128C7E; }
-
-    /* Contact Form */
-    .contact-form { margin-top: 2rem; }
-    form { display: flex; flex-direction: column; }
-    form input, form textarea, form button {
-      margin-bottom: 1rem;
-      padding: 0.8rem;
-      border-radius: 8px;
+    input, textarea, button {
+      width: 100%;
+      margin: 0.5rem 0;
+      padding: 0.6rem;
       border: 1px solid #ccc;
+      border-radius: 5px;
       font-size: 1rem;
     }
-    form input:focus, form textarea:focus { border-color: #4B0082; outline: none; }
-    form button {
-      background-color: #4B0082;
-      color: #fff;
-      font-weight: bold;
+
+    button {
+      background: #1976d2;
+      color: white;
       border: none;
       cursor: pointer;
-      transition: background 0.3s ease;
+      transition: 0.3s;
     }
-    form button:hover { background-color: #1a1a1a; }
 
-    .message-box {
-      padding: 1rem;
-      margin-top: 1rem;
-      display: none;
-      border-radius: 8px;
-      opacity: 0;
-      transition: opacity 0.5s ease;
+    button:hover {
+      background: #0d47a1;
     }
-    .message-success { background-color: #d4edda; color: #155724; }
-    .message-error { background-color: #f8d7da; color: #721c24; }
 
-    /* Google Maps */
-    .location iframe {
-      width: 100%;
-      height: 300px;
-      border: 0;
-      border-radius: 12px;
-    }
-    .location a { color: #4B0082; text-decoration: none; font-weight: bold; }
-    .location a:hover { text-decoration: underline; }
-
-    /* Image Uploads */
-    .uploads {
-      display: grid;
-      grid-template-columns: repeat(auto-fill,minmax(200px,1fr));
-      gap: 15px;
+    .contact-options {
+      text-align: center;
       margin-top: 2rem;
     }
-    .uploads img {
-      width: 100%;
-      border-radius: 12px;
-      object-fit: cover;
-      border: 2px solid #4B0082;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-      cursor: pointer;
-    }
-    .uploads img:hover {
-      transform: scale(1.05);
-      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
-    }
 
-    /* Back-to-top button */
-    #backToTop {
-      position: fixed;
-      bottom: 40px;
-      right: 40px;
-      background-color: #4B0082;
-      color: #fff;
-      padding: 0.8rem 1rem;
+    .contact-options button {
+      display: inline-block;
+      margin: 0.5rem;
+      padding: 0.8rem 1.2rem;
+      font-size: 1rem;
+      border-radius: 8px;
+      background: #25D366;
+      color: white;
       border: none;
-      border-radius: 50px;
       cursor: pointer;
-      display: none;
-      z-index: 100;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-      transition: background 0.3s ease;
+      transition: transform 0.2s ease;
     }
-    #backToTop:hover { background-color: #1a1a1a; }
 
-    @media (max-width: 600px){
-      header h1 { font-size: 1.5rem; }
-      #backToTop { bottom: 20px; right: 20px; }
+    .contact-options button.call-btn {
+      background: #1976d2;
+    }
+
+    .contact-options button:hover {
+      transform: scale(1.05);
+    }
+
+    /* Popup styling */
+    .popup {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+      z-index: 10;
+    }
+
+    .popup.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .popup-content {
+      background: white;
+      padding: 2rem;
+      border-radius: 10px;
+      text-align: center;
+      box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+      transform: scale(0.8);
+      transition: transform 0.3s ease;
+    }
+
+    .popup.active .popup-content {
+      transform: scale(1);
+    }
+
+    .popup h3 {
+      color: #1976d2;
+      margin-bottom: 1rem;
+    }
+
+    .popup button {
+      margin-top: 1rem;
+      background: #1976d2;
+      color: white;
+      border: none;
+      padding: 0.6rem 1.2rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+
+    /* Loading Spinner */
+    .spinner-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(255,255,255,0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 10px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .spinner-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .spinner {
+      border: 5px solid #f3f3f3;
+      border-top: 5px solid #1976d2;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
 <body>
+  <header>Contact Millionare Motors</header>
 
-  <header>
-    <h1>Contact Millionaire Motors</h1>
-  </header>
-
-  <main>
-    <p>Reach out via phone, WhatsApp, or our contact form below. You can also visit our location or view our latest uploads.</p>
-
-    <!-- Contact Info -->
-    <div class="contact-info">
-      <h2>Contact Info</h2>
-      <div><strong>Phone:</strong> <a href="tel:+254115908207">Call us</a></div>
-      <div><strong>WhatsApp:</strong>
-        <a class="contact-button" href="https://wa.me/254115908207" target="_blank" rel="noopener noreferrer">
-          Chat on WhatsApp
-        </a>
-      </div>
+  <div class="container">
+    <!-- Google Map -->
+    <div>
+      <iframe
+        src="https://www.google.com/maps?q=-4.0614000,39.6638000&z=15&output=embed"
+        allowfullscreen
+      ></iframe>
     </div>
 
     <!-- Contact Form -->
-    <div class="contact-form">
+    <form id="contactForm">
       <h2>Send Us a Message</h2>
-      <form id="contactForm">
-        <input type="text" name="name" placeholder="Your Name" required>
-        <input type="email" name="email" placeholder="Your Email" required>
-        <textarea name="message" rows="5" placeholder="Your Message" required></textarea>
-        <button type="submit">Send Message</button>
-      </form>
-      <div id="formMessage" class="message-box"></div>
+      <input type="text" name="name" placeholder="Your Name" required />
+      <input type="email" name="email" placeholder="Your Email" required />
+      <textarea name="message" placeholder="Your Message" rows="5" required></textarea>
+      <button type="submit">Send Message</button>
+
+      <!-- Spinner -->
+      <div class="spinner-overlay" id="spinnerOverlay">
+        <div class="spinner"></div>
+      </div>
+    </form>
+  </div>
+
+  <!-- Contact Options -->
+  <div class="contact-options">
+    <button id="whatsappBtn">Chat on WhatsApp</button>
+    <button class="call-btn" id="callBtn">Call Us</button>
+  </div>
+
+  <!-- Success Popup -->
+  <div id="popup" class="popup">
+    <div class="popup-content">
+      <h3>✅ Message Sent Successfully!</h3>
+      <p>Thank you for reaching out. We’ll get back to you soon.</p>
+      <button id="closePopup">OK</button>
     </div>
-
-    <!-- Location -->
-    <div class="location">
-      <h2>Our Location</h2>
-      <iframe 
-        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1994.070404038737!2d36.80637767615062!3d-1.3036446991442434!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x182f10d8747b5d3d%3A0x5e7f7b1db9f3d9e0!2sMillionaire%20Motors!5e0!3m2!1sen!2ske!4v1700119512330!5m2!1sen!2ske" 
-        allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade">
-      </iframe>
-      <p><a href="https://goo.gl/maps/j7jC2GoQFa6GZJgM8" target="_blank">Open in Google Maps</a></p>
-    </div>
-
-    <!-- Image/Uploads -->
-    <div class="uploads" id="uploadsSection">
-      <h2>Latest Uploads</h2>
-      <!-- Images dynamically loaded here -->
-    </div>
-
-  </main>
-
-  <!-- Back-to-top Button -->
-  <button id="backToTop">↑ Top</button>
+  </div>
 
   <script>
-    // Back-to-top button
-    const backToTop = document.getElementById('backToTop');
-    window.addEventListener('scroll', () => {
-      if(window.scrollY > 300) backToTop.style.display = 'block';
-      else backToTop.style.display = 'none';
-    });
-    backToTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
-
-    // Handle contact form submission
     const form = document.getElementById('contactForm');
-    const formMessage = document.getElementById('formMessage');
+    const popup = document.getElementById('popup');
+    const spinner = document.getElementById('spinnerOverlay');
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
-      const formData = new FormData(form);
-      const data = Object.fromEntries(formData.entries());
-      formMessage.style.display = 'block';
-      formMessage.style.opacity = 0;
+      spinner.classList.add('active');
+
       try {
-        const response = await fetch('/send', {
+        const formData = new FormData(form);
+        const res = await fetch('/send-message', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(data)
+          body: new URLSearchParams(formData),
         });
-        const result = await response.json();
-        if(result.success){
-          formMessage.className = 'message-box message-success';
-          formMessage.textContent = 'Message sent successfully!';
+
+        if (res.ok) {
+          popup.classList.add('active');
           form.reset();
         } else {
-          formMessage.className = 'message-box message-error';
-          formMessage.textContent = 'Failed to send message. Try again later.';
+          alert('⚠️ Failed to send message. Please try again later.');
         }
-      } catch(err){
-        formMessage.className = 'message-box message-error';
-        formMessage.textContent = 'Error sending message.';
+      } catch (err) {
+        alert('⚠️ Network error. Please check your connection.');
+      } finally {
+        spinner.classList.remove('active');
       }
-      // Animate fade-in
-      let opacity = 0;
-      const fadeInterval = setInterval(() => {
-        if(opacity >= 1) clearInterval(fadeInterval);
-        opacity += 0.05;
-        formMessage.style.opacity = opacity;
-      }, 20);
     });
 
-    // Load uploaded images dynamically
-    async function loadImages() {
-      try {
-        const res = await fetch('/images');
-        const images = await res.json();
-        const uploadsSection = document.getElementById('uploadsSection');
-        images.forEach(img => {
-          const imageElement = document.createElement('img');
-          imageElement.src = `/uploads/${img}`;
-          imageElement.alt = img;
-          uploadsSection.appendChild(imageElement);
-        });
-      } catch(err){
-        console.log('Error loading images:', err);
-      }
-    }
-    loadImages();
-  </script>
+    document.getElementById('closePopup').addEventListener('click', () => {
+      popup.classList.remove('active');
+    });
 
+    // Hidden contact info
+    const phoneNumber = '+254115908207';
+    const encodedPhone = btoa(phoneNumber);
+
+    document.getElementById('whatsappBtn').addEventListener('click', () => {
+      const decoded = atob(encodedPhone);
+      const url = `https://wa.me/${decoded.replace('+', '')}`;
+      window.open(url, '_blank');
+    });
+
+    document.getElementById('callBtn').addEventListener('click', () => {
+      const decoded = atob(encodedPhone);
+      window.location.href = `tel:${decoded}`;
+    });
+  </script>
 </body>
 </html>
